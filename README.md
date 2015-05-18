@@ -1,5 +1,5 @@
 # btcpokerstats
-Code base for btcpokerstats.com (defunct)
+Code base for http://btcpokerstats.com
 
 
 
