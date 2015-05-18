@@ -1,0 +1,229 @@
+{% extends 'stats/base.html' %}
+{% load staticfiles %}
+
+{% block scripts1 %}
+
+	<link href="{% static "scripts/examples.css" %}" rel="stylesheet" type="text/css">
+    
+{% endblock %}
+ 
+
+{% block body %} 
+<div class="page-header well">
+<form  id="hud_options" method="post" action="{% url 'hud' %}" onsubmit="selectAllOptions('stats_selected');">
+	{% csrf_token %}
+<div class="row">
+	<div class="col-lg-12">
+
+		<div class="col-lg-4">
+	    	<label>Stats</label>
+			<select multiple class="form-control select-toggle" id="stats_selected" name="stats_selected" size="5" style="overflow:auto;">
+				<option value="num_hands">Hands</option>
+				<option value="amount_won">Winnings </option>
+				<option value="vpip">Voluntarily Put chips In Pot (%)</option>
+				<option value="pfr">Preflop Raise (%)</option>
+				<option value="pf3b">Preflop 3bet (%)</option>
+				<option value="cbet">Continuation Bet Flop (%)</option>
+				<option value="f_cbet">Fold to Flop Continuation Bet (%)</option>
+				<option value="f_pf3b">Fold to Preflop 3bet (%)</option>
+				<option value="c_pf3b">Call Preflop 3bet (%)</option>
+				<option value="r_pf3b">Preflop 4bet (%)</option>				
+				<option value="c_cbet">Call Flop Continuation Bet (%)</option>
+				<option value="r_cbet">Raise Flop Continuation Bet (%)</option>
+				<option value="wtsd">Went to Showdown (%)</option>
+				<option value="wsd">Won chips at Showdown (%)</option>
+			</select>
+		</div>
+
+		<div class="col-lg-8">
+
+		
+			<div class="col-lg-3">	
+				<label>Limit Type</label>
+				<select class="form-control" name="limit_type" id="limit_type">
+					<option value="All" selected>All</option>
+					<option value="NL">No Limit</option>
+					<option value="PL">Pot Limit</option>
+					<option value="L">Limit</option>
+				</select>
+			</div>
+
+			<div class="col-lg-3">				
+				<label>Game Type</label>
+				<select class="form-control" name="game_type" id="game_type">
+					<option value="All" selected>All</option>
+					<option value="HE">Holdem</option>
+					<option value="O">Omaha</option>
+					<option value="O8">Omaha Hi-Lo</option>
+				</select>
+			</div>
+
+			<div class="col-lg-3">
+				<label>Blinds</label>
+				<select class="form-control" name="blinds" id="blinds" style="width:100%;">
+					<option value="All" selected>All</option>
+					<option value="0.04">0.02/0.04</option>
+					<option value="0.1">0.05/0.10</option>
+					<option value="0.2">0.10/0.20</option>
+					<option value="0.5">0.25/0.50</option>
+					<option value="1">0.50/1</option>
+					<option value="2">1/2</option>
+					<option value="4">2/4</option>
+					<option value="6">3/6</option>
+					<option value="8">4/8</option>
+					<option value="10">5/10</option>
+					<option value="16">8/16</option>
+					<option value="20">10/20</option>
+					<option value="30">15/30</option>
+					<option value="40">20/40</option>
+					<option value="50">25/50</option>
+					<option value="80">40/80</option>
+					<option value="100">50/100</option>
+					<option value="150">75/150</option>
+					<option value="200">100/200</option>
+					<option value="300">150/300</option>
+					<option value="400">200/400</option>
+					<option value="600">300/600</option>
+				</select>
+			</div>
+
+			<div class="col-lg-3">
+				<label>Seat Type</label>
+				<select class="form-control" name="seat_type" id="seat_type">
+					<option value="All" selected>All</option>
+					<option value="HU">Heads Up</option>
+					<option value="6max">6 max</option>
+					<option value="9max">9 max</option>
+				</select>
+			</div>
+
+			<div class="col-lg-3">
+				<label>After</label>
+				<div id="datetimepicker1" class="input-append date">
+		    		<input class="form-control" name="start_date" data-format="yyyy-MM-dd hh:mm" value="2014-12-31 00:00" maxlength="16" type="text">
+		    		<span class="add-on">
+		      			<i data-time-icon="icon-time" data-date-icon="icon-calendar">
+		      			</i>
+		    		</span>
+	  			</div>
+			</div>
+
+			<div class="col-lg-3">
+				<label>Before</label>
+				<div id="datetimepicker2" class="input-append date">
+		    		<input class="form-control" name="end_date" data-format="yyyy-MM-dd hh:mm" value="2015-12-31 00:00" maxlength="16" type="text">
+		    		<span class="add-on">
+		      			<i data-time-icon="icon-time" data-date-icon="icon-calendar">
+		      			</i>
+		    		</span>
+	  			</div>
+			</div>
+
+
+			<div class ="col-lg-6">
+				<label>Players</label>
+				<div class="input-group custom-search-form" >		
+					<input type="text" class="form-control" placeholder='Search for one or more players e.g. player1, player2, player3,...' name="players" value="" id="players" 
+						style="display:table-cell;border-top-right-radius:0;border-bottom-right-radius:0">
+			        <span class="input-group-btn"  >
+			            <button class="btn btn-default" type="submit" name="submit" value="Search" style="border-top-left-radius:0;border-bottom-left-radius:0">
+			                <i class="fa fa-search"></i>
+			            </button>
+			        </span>
+				</div>
+			</div>
+
+
+
+
+		</div>
+	</div>
+</div>
+
+</form>
+</div>
+
+{% if name %}
+<div class="row">
+	<!-- .panel -->
+	<div class="panel panel-info">
+	    <div class="panel-heading">
+	    	<div class="panel-title" style="width:100%;white-space:nowrap;">
+	    		<div style="display:inline-block;width:25%;text-align:left;">
+                   <strong>Player Stats</strong>
+                </div>
+                <div style="display:inline-block;width:75%;text-align:right;">                       
+                    {{ name }}
+                </div>
+	       	</div>
+	    </div>
+	    <!-- .panel-body -->
+        <div class="panel-body">
+             <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            {% for c in colnames%}
+                            <th style="text-align:center" >{{c}}</th>
+                   			{% endfor %}
+                        </tr>
+                     </thead>
+                    <tbody>
+                    {% for result in results %}
+                        <tr>
+                        	{% for r in result %}
+                            <td style="text-align:center">{{r}}</td>
+                        	{% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+
+
+{% block scripts2 %}
+<link href="{% static "scripts/bootstrap-datetimepicker.min.css" %}" rel="stylesheet" type="text/css">
+<script language="javascript" type="text/javascript" src="{% static "scripts/bootstrap-datetimepicker.min.js" %}"></script>
+
+
+<script type="text/javascript">
+
+ $(function() {
+    $('#datetimepicker1').datetimepicker({
+      language: 'en',
+      pickSeconds: false,
+
+    });
+  });
+
+ $(function() {
+    $('#datetimepicker2').datetimepicker({
+      language: 'en',
+      pickSeconds: false,
+
+    });
+  });
+
+
+$('.select-toggle').each(function(){    
+    var select = $(this), values = {};    
+    $('option',select).each(function(i, option){
+        values[option.value] = option.selected;        
+    }).click(function(event){        
+        values[this.value] = !values[this.value];
+        $('option',select).each(function(i, option){            
+            option.selected = values[option.value];        
+        });    
+    });
+});
+
+</script>
+{% endblock %}

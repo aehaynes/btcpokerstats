@@ -1,0 +1,355 @@
+{% extends 'stats/base.html' %}
+{% load staticfiles %}
+
+{% block scripts1 %}
+	<link href="{% static "scripts/examples.css" %}" rel="stylesheet" type="text/css">
+    <script type="text/javascript"src="{% static "scripts/dygraph-combined.js" %}"></script>
+
+{% endblock %}
+ 
+
+{% block body %}    
+	    <div class="row">
+	        <div class="col-lg-12">
+	            <h4 class="page-header">	            	
+	            </h4>
+	        </div>
+	    </div>
+        <div class="row">
+        {% if found %}
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                	<div class="panel-title" style="width:100%;">
+                        <div style="display:inline-block;width:100%;text-align:left;">
+                            <strong> {{ name }}'s profile</strong>&emsp;|&emsp;Total Winnings: {{ total_won }} Chips
+                        </div>
+                   	</div>
+                </div>
+                <div class="panel-body">
+                    <div class="panel-group" id="winnings">
+                        {% if dygraph_r %}
+                        <div class="panel panel-mod">
+                            <div class="panel-heading">
+                                <div class="panel-title2" style="width:100%;">
+                                    <a data-toggle="collapse" href="#collapse_rngwinnings">
+                                        <div style="display:inline-block;width:100%;text-align:left;">
+                                            <strong>Ring Game Winnings:&emsp;</strong> {{ total_won_ring }} Chips&emsp;|&emsp;{{ total_hands }} Hands
+                                        </div>
+                                    </a>                
+                                </div>
+                            </div>
+                            <div id="collapse_rngwinnings" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="mod-container">
+                                    <div id="graph_r" class="mod-placeholder"></div>
+                                    <div class="row" id="checkdiv_r">
+                                        <input type="radio" id="0" name="bbvsc" onClick="change_r(this)" value = "1"checked><label for="0"> Chips</label>
+                                        <input type="radio" id="1" name="bbvsc" onClick="change_r(this)" value="0"><label for="1"> bb</label>
+                                        <input type=checkbox id="2" onClick="change_r(this)"><label for="2">Hands</label>
+                                    </div>
+                                </div>
+                            </div>
+                       
+                            <div class="panel-footer">
+                            {% for table in tables_r %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title2" style="width:100%;">
+                                            <a data-toggle="collapse" data-parent="#collapse_rngwinnings" href="#collapse{{ table.limit_type }}" >
+                                                <div style="display:inline-block;width:100%;text-align:left;">
+                                                    <strong>{{ table.limit_type }}</strong>&emsp;|&emsp;{{ table.l_won }} Chips&emsp;|&emsp;{{ table.l_hands }} Hands
+                                                </div>
+                                               
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% if forloop.counter == 1 %}
+                                    <div id="collapse{{ table.limit_type }}" class="panel-collapse collapse in">
+                                    {% else %}
+                                    <div id="collapse{{ table.limit_type }}" class="panel-collapse collapse">
+                                {% endif %}
+                                        <div class="panel-body">
+                                             <div class="table-responsive">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:center" >Limit</th>
+                                                            <th style="text-align:center" >Hands</th>
+                                                            <th style="text-align:center" >Last Played</th>
+                                                            <th style="text-align:center" >Won (chips)</th>
+                                                            <th style="text-align:center" >Win Rate (bb/100)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for gametable in table.games %}
+                                                        <tr>
+                                                            <td style="text-align:center">{{gametable.game}}</td>
+                                                            <td style="text-align:center">{{gametable.hands}}</td>
+                                                            <td style="text-align:center"> {{gametable.dt}}</td>
+                                                            <td style="text-align:center">{{gametable.won_chips}}</td>
+                                                            <td style="text-align:center">{{gametable.bb_100}}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            </div>
+                        </div>                
+                        {% endif %}
+                        {% if dygraph_t %}
+                        <!-- TOURNEY STATS -->
+                        <div class="panel panel-mod">
+                            <div class="panel-heading">
+                                <div class="panel-title2" style="width:100%;">
+                                <a data-toggle="collapse"  href="#collapse_twinnings">
+                                    <div style="display:inline-block;width:100%;text-align:left;">
+                                        <strong>Tournament Winnings:&emsp;</strong> {{ total_won_tourn }} Chips&emsp;|&emsp;{{ total_roi }} % ROI&emsp;|&emsp;{{ total_games }} Games
+                                    </div>                                                              
+                                </a>              
+                                </div>
+                            </div>
+                            <div id="collapse_twinnings" class="panel-collapse collapse in">
+                                <div class="panel-body">
+                                    <div class="mod-container">
+                                        <div id="graph_t" class="mod-placeholder"></div>
+                                        <div class="row" id="checkdiv_t">
+                                            <input type="radio" id="0" name="roivsc" onClick="change_t(this)" value = "1"checked><label for="0"> Chips</label>
+                                            <input type="radio" id="1" name="roivsc" onClick="change_t(this)" value="0"><label for="1"> ROI %</label>
+                                            <input type=checkbox id="2" onClick="change_t(this)"><label for="2">Games</label>
+                                        </div>
+                                    </div>
+                                </div>
+                       
+                            <div class="panel-footer">                            
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title2">
+                                            <a data-toggle="collapse" data-parent="#twinnings" href="#_collapse_summary">
+                                                <p style="text-align:left;margin-top:0;margin-bottom:0;margin-left:0;margin-right:0;">
+                                                    <strong>Summary</strong> 
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                
+                                    <div id="_collapse_summary" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+                                             <div class="table-responsive">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:center" >Buy In (chips)</th>
+                                                            <th style="text-align:center" ># of Games</th>
+                                                            <th style="text-align:center" >Net Profit (chips)</th>
+                                                            <th style="text-align:center" >ROI (%)</th>
+                                                            <th style="text-align:center" >ITM (%)</th>                                                            
+                                                            <th style="text-align:center" >Normalized Rank (/100)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for game in tables_t %}
+                                                        <tr>
+                                                            <td style="text-align:center">{{game.buy_in}}</td>
+                                                            <td style="text-align:center">{{game.num_games}}</td>
+                                                            <td style="text-align:center"> {{game.net}}</td>
+                                                            <td style="text-align:center">{{game.roi}}</td>
+                                                            <td style="text-align:center">{{game.itm}}</td>
+                                                            <td style="text-align:center">{{game.rank}}</td>
+                                                            
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title2">
+                                            <a data-toggle="collapse" data-parent="#twinnings" href="#_collapse_recent">
+                                                <p style="text-align:left;margin-top:0;margin-bottom:0;margin-left:0;margin-right:0;">
+                                                    <strong>Recent Tournaments</strong> 
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div id="_collapse_recent" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+                                             <div class="table-responsive">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:center" >Tournament Name</th>
+                                                            <th style="text-align:center" >Date</th>
+                                                            <th style="text-align:center" >Buy In (chips)</th>
+                                                            <th style="text-align:center" >Rank</th>
+                                                            <th style="text-align:center" ># of Players</th>
+                                                            <th style="text-align:center" >Net Profit (chips)</th>                                                            
+                                                            <th style="text-align:center" >ROI (%)</th>                                                
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for game in last_tourneys %}
+                                                        <tr>
+                                                            <td style="text-align:center">{{game.name}}</td>
+                                                            <td style="text-align:center">{{game.date}}</td>
+                                                            <td style="text-align:center">{{game.buy_in}}</td>
+                                                            <td style="text-align:center">{{game.rank}}</td>
+                                                            <td style="text-align:center">{{game.entrants}}</td>                                                            
+                                                            <td style="text-align:center">{{game.won_chips}}</td>
+                                                            <td style="text-align:center">{{game.roi}}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                            {% endif %}
+                        </div>
+        		  </div>	
+                </div>
+            </div>
+            {% else %}
+                {% if name %}
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title" style="width:100%;">
+                            <div style="display:inline-block;width:100%;text-align:left;">
+                                <strong> {{ name }}</strong> 
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+
+
+            {% endif %}
+        </div>
+
+    
+{% endblock %}
+
+{% block scripts2 %}
+
+{% if found %}
+<script type="text/javascript">
+
+g_r = graph_r(ring_data, [true, false, false]);
+g_t = graph_t(tourney_data, [true, false, false]);
+setStatus();
+
+function graph_r(d,v, h_ax) {
+    return new Dygraph(
+                        document.getElementById("graph_r"), d,
+                            {   legend: 'always',
+                                labels: [ 'Date', 'Chips', 'bb', 'Hands' ],
+                                series: {   'Chips': { axis: 'y' },
+                                            'bb': { axis: 'y' }, 
+                                            'Hands': { axis: h_ax },},
+                                        axes: {     y: {    labelsKMB: true, 
+                                                            independentTicks: true, gridLinePattern: [1,1] },
+                                                    y2: {   labelsKMB: true, 
+                                                            drawGrid: true, 
+                                                            independentTicks: true, 
+                                                            gridLinePattern: [1,1] }},
+                                ylabel: 'Profit',
+                                y2label: 'Hands',
+                                stepPlot: false,
+                                yAxisLabelWidth: 50,
+                                visibility: v,
+                                fillGraph: true,
+                                strokeWidth: 0.75,
+                                highlightSeriesOpts: {
+                                                        highlightCircleSize: 3,
+                                                            },
+                            }
+                        ); }
+
+function graph_t(d,v, h_ax) {
+    return new Dygraph(
+                        document.getElementById("graph_t"), d,
+                            {   legend: 'always',
+                                labels: [ 'Date', 'Chips', 'ROI', 'Games' ],
+                                series: {   'Chips': { axis: 'y' },
+                                            'ROI': { axis: 'y' }, 
+                                            'Games': { axis: h_ax },},
+                                        axes: {     y: {    labelsKMB: true, 
+                                                            independentTicks: true, gridLinePattern: [1,1] },
+                                                    y2: {   labelsKMB: true, 
+                                                            drawGrid: true, 
+                                                            independentTicks: true, 
+                                                            gridLinePattern: [1,1] }},
+                                ylabel: 'Profit',
+                                y2label: 'Games',
+                                stepPlot: false,
+                                yAxisLabelWidth: 50,
+                                visibility: v,
+                                fillGraph: true,
+                                strokeWidth: 0.75,
+                                highlightSeriesOpts: {
+                                                        highlightCircleSize: 3,
+                                                            },
+                            }
+                        ); }
+
+function ring_data() {
+    return "Date,Chips,bb,Hands\n" + "{{dygraph_r|safe}}" }
+
+function tourney_data() {
+    return "Date,Chips,ROI,Games\n" + "{{dygraph_t|safe}}" }
+
+function setStatus(x) {
+    document.getElementById("visibility").innerHTML =
+            x.visibility().toString(); }
+
+function change_r(el) {
+    g_r.setVisibility(parseInt(el.id), el.checked);
+    g_r.setVisibility(parseInt(el.value), false);
+    if ( parseInt(el.id) == 2) {
+       if ( el.checked ) {
+            vis = g_r.visibility();
+            g_r.destroy();
+            g_r = graph_r(ring_data, vis, 'y2');
+            setStatus();
+        } else { 
+            g_r.updateOptions( {   series: {  'Chips': { axis: 'y' },
+                                            'bb': { axis: 'y' }, 
+                                            'Hands': { axis: 'y' },} } );
+        }
+    } 
+    setStatus(g_r); }
+
+function change_t(el) {
+    g_t.setVisibility(parseInt(el.id), el.checked);
+    g_t.setVisibility(parseInt(el.value), false);
+    if ( parseInt(el.id) == 2) {
+       if ( el.checked ) {
+            vis = g_t.visibility();
+            g_t.destroy();
+            g_t = graph_t(tourney_data, vis, 'y2');
+            setStatus();
+        } else { 
+            g_t.updateOptions( {   series: {  'Chips': { axis: 'y' },
+                                            'ROI': { axis: 'y' }, 
+                                            'Games': { axis: 'y' },} } );
+        }
+    } 
+    setStatus(g_t); }
+
+</script>
+
+{% endif %}
+{% endblock %}

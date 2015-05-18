@@ -1,0 +1,98 @@
+{% extends 'stats/base.html' %}
+{% load staticfiles %}
+
+{% block scripts1 %}
+	<link href="{% static "scripts/examples.css" %}" rel="stylesheet" type="text/css">
+    <script type="text/javascript"src="{% static "scripts/dygraph-combined.js" %}"></script>
+
+{% endblock %}
+ 
+
+{% block body %}    
+    <div class="row">
+        <div class="col-lg-12">
+            <h4 class="page-header">	            	
+            </h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+            	<div class="panel-title" style="width:100%;">
+                    <div style="display:inline-block;width:100%;text-align:left;">
+                        <strong>{{target}} tracker</strong> 
+                    </div>
+               	</div>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-mod">
+                    <div class="panel-heading">
+                        <div class="panel-title" style="width:100%;">
+                            <div style="display:inline-block;width:100%;text-align:left;">
+                                <strong> Ring Game tracker:</strong>&emsp;{{total_hands}} Hands&emsp;|&emsp; {{r_percent_up}}% Uptime since {{start_date}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="mod-container">
+                            <div id="graph_r" class="mod-placeholder"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-mod">
+                    <div class="panel-heading">
+                        <div class="panel-title" style="width:100%;">
+                            <div style="display:inline-block;width:100%;text-align:left;">
+                                <strong> Tournament tracker:</strong>&emsp;{{total_games}} Games&emsp;|&emsp; {{t_percent_up}}% Uptime since {{start_date}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="mod-container">
+                            <div id="graph_t" class="mod-placeholder"></div>
+                        </div>
+                    </div>
+                </div>         
+        </div>
+    </div>
+   
+{% endblock %}
+{% block scripts2 %}
+
+<script type="text/javascript">
+
+g_r = graph(ring_data, "graph_r");
+g_t = graph(tourney_data, "graph_t");
+function graph(d, id) {
+    return new Dygraph(
+                        document.getElementById(id), d,
+                            {   legend: 'always',
+                                labels: [ 'Date', 'Status' ],
+                                series: {   'Status': { axis: 'y' },},
+                                        axes: {     y: {    ticker: function(min, max, pixels, opts, dygraph, vals) {
+                                                              return [{v:0.001, label:"Offline"}, {v:1, label:"Online"}];
+                                                            },
+                                                            labelsKMB: false, 
+                                                            independentTicks: true, gridLinePattern: [1,1] }},
+                                ylabel: 'Status',
+                                stepPlot: true,
+                                yAxisLabelWidth: 50,
+                                fillGraph: true,
+                                strokeWidth: 0.75,
+                                highlightSeriesOpts: {
+                                                        highlightCircleSize: 3,
+                                                            },
+                            }
+                        ); }
+
+function ring_data() {
+    return "Date,Status\n" + "{{dygraph_r|safe}}" }
+
+function tourney_data() {
+    return "Date,Status\n" + "{{dygraph_t|safe}}" }
+function test_data(){
+    return "Date,Status\n" + "2005-01-01 00:00,1\n" }
+
+</script>
+
+{% endblock %}
