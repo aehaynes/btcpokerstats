@@ -11,12 +11,8 @@ END_STR = '\x00'
 UNNAMED_HAND_IDENTIFIER = 'UNDEFINED'
 SITTINGOUT_STR = 'Sitting Out'
 
-#---TEST PATHS
 BASE_DIR = '/home/nonroot/Projects/'
 HH_PATH = BASE_DIR + 'swc-api/outdir/'
 DB_INFO = ['swc','postgres', 'postgres']
-#---CURRENT PATHS
-#HH_PATH = '/home/fides/Downloads/Projects/swc-api/outdir/'
-#DB_INFO = ['swc','postgres', 'postgres']
 
 CHAT_PATH = BASE_DIR + 'swc-api/Log Archives/'
