@@ -23,7 +23,7 @@ The repo includes:
 	
 	
 	
-Disclaimer: This was my first time using a few of these tools, especially Django. The code may be ugly/buggy.
+Disclaimer: This was my first time using a few of these tools, especially Django. YMMV
 
 
 You can donate here if you're feeling generous: 1JNNXWAbG82RyRSHfLbZjEdWFo2M5gK9cU
